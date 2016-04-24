@@ -9,6 +9,7 @@ Visual Studio is a high integrated software whose components may depend on:
 * Its version, such as 2008, 2010, 2012, ...
 * Does it contain service packs, such as sp1, or update1, update2, ...
 * The components you selected when you installed Visual Studio.
+* The architecture of your Operating System, 32 or 64 bit.
 
 Each condition may need its own uninstall script. This script is specified for **default installation of VS2013 Ultimate with Update 2 Chinese Simplified**.
 
