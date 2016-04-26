@@ -8,9 +8,12 @@
 VisualStudioUninstaller::VisualStudioUninstaller(QWidget *parent)
 	: QMainWindow(parent)
 {
+    ui.setupUi(this);
+    ui.tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui.tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui.tableView->setSortingEnabled(true);
     _model = new QStandardItemModel;
-
-	ui.setupUi(this);
+	
     productList();
 }
 
