@@ -19,6 +19,7 @@ struct Product
     QString version;
 };
 
+class QStandardItemModel;
 class VisualStudioUninstaller : public QMainWindow
 {
 	Q_OBJECT
@@ -27,11 +28,13 @@ public:
 	VisualStudioUninstaller(QWidget *parent = 0);
 	~VisualStudioUninstaller();
 
-private:
     QList<Product *> productList();
+    void updateTableView();
 
+private:
 	Ui::VisualStudioUninstallerClass ui;
     QProcess _process;
+    QStandardItemModel *_model;
 };
 
 #endif // VISUALSTUDIOUNINSTALLER_H

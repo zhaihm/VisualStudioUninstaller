@@ -1,9 +1,13 @@
 #include "visualstudiouninstaller.h"
 #include <qDebug>
+#include <QStandardItemModel>
+#include <QStandardItem>
 
 VisualStudioUninstaller::VisualStudioUninstaller(QWidget *parent)
 	: QMainWindow(parent)
 {
+    _model = new QStandardItemModel;
+
 	ui.setupUi(this);
     productList();
 }
@@ -17,6 +21,14 @@ QList<Product *> VisualStudioUninstaller::productList()
 {
     QList<Product *> productList;
 
+    // init table
+    QStringList columns = { "Description", "IdentifyingNumber", "InstallDate", "InstallLocation", "InstallState", "Name", "PackageCache", "SKUNumber", "Vendor", "Version" };
+    _model->setColumnCount(columns.length());
+    for (size_t i = 0; i < columns.length(); i++) {
+        _model->setHeaderData(i, Qt::Horizontal, columns[i]);
+    }
+    ui.tableView->setModel(_model);
+
     QString program = "wmic";
     QStringList args;
     args << "product" << "list";
@@ -29,7 +41,6 @@ QList<Product *> VisualStudioUninstaller::productList()
     if (header.isEmpty())
         return productList;
 
-    QStringList columns = { "Description", "IdentifyingNumber", "InstallDate", "InstallLocation", "InstallState", "Name", "PackageCache", "SKUNumber", "Vendor", "Version" };
     QList<int> indexes;
     foreach (QString column, columns) {
         indexes.push_back(header.indexOf(column));
@@ -52,5 +63,24 @@ QList<Product *> VisualStudioUninstaller::productList()
 
         productList.push_back(product);
     }
+
+    for (size_t i = 0; i < productList.length(); i++) {
+        _model->setItem(i, 0, new QStandardItem(tr(productList[i]->desc.toStdString().c_str())));
+        _model->setItem(i, 1, new QStandardItem(productList[i]->idNumber));
+        _model->setItem(i, 2, new QStandardItem(productList[i]->installDate));
+        _model->setItem(i, 3, new QStandardItem(productList[i]->installLocation));
+        _model->setItem(i, 4, new QStandardItem(productList[i]->installState));
+        _model->setItem(i, 5, new QStandardItem(productList[i]->name));
+        _model->setItem(i, 6, new QStandardItem(productList[i]->packCache));
+        _model->setItem(i, 7, new QStandardItem(productList[i]->skuNumber));
+        _model->setItem(i, 8, new QStandardItem(productList[i]->vendor));
+        _model->setItem(i, 9, new QStandardItem(productList[i]->version));
+    }
+
     return productList;
+}
+
+void VisualStudioUninstaller::updateTableView()
+{
+    
 }
