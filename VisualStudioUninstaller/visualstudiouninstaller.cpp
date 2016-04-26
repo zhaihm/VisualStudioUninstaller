@@ -3,6 +3,8 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 
+#define LOCALE  "GBK"
+
 VisualStudioUninstaller::VisualStudioUninstaller(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -37,7 +39,10 @@ QList<Product *> VisualStudioUninstaller::productList()
     if (!_process.waitForStarted() || !_process.waitForFinished())
         return productList;
 
-    QString header = _process.readLine();
+    QTextStream ts(&_process);
+    ts.setCodec(LOCALE);
+
+    QString header = ts.readLine();
     if (header.isEmpty())
         return productList;
 
@@ -47,7 +52,7 @@ QList<Product *> VisualStudioUninstaller::productList()
     }
 
     QString line;
-    while (!(line = _process.readLine()).isEmpty()) {
+    while (!(line = ts.readLine()).isEmpty()) {
         Product *product = new Product;
         int i = 0;
         product->desc = line.mid(indexes[i], indexes[i + 1] - indexes[i++]).trimmed();
