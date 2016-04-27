@@ -22,9 +22,9 @@ VisualStudioUninstaller::~VisualStudioUninstaller()
 
 }
 
-QList<Product *> VisualStudioUninstaller::productList()
+QList<QStringList> VisualStudioUninstaller::productList()
 {
-    QList<Product *> productList;
+    QList<QStringList> productList; // not using QStringList *, to avoid (*productList[i])[j]
 
     // init table
     QStringList columns = { "Description", "IdentifyingNumber", "InstallDate", "InstallLocation", "InstallState", "Name", "PackageCache", "SKUNumber", "Vendor", "Version" };
@@ -56,33 +56,19 @@ QList<Product *> VisualStudioUninstaller::productList()
 
     QString line;
     while (!(line = ts.readLine()).isEmpty()) {
-        Product *product = new Product;
-        int i = 0;
-        product->desc = line.mid(indexes[i], indexes[i + 1] - indexes[i++]).trimmed();
-        product->idNumber = line.mid(indexes[i], indexes[i + 1] - indexes[i++]).trimmed();
-        product->installDate = line.mid(indexes[i], indexes[i + 1] - indexes[i++]).trimmed();
-        product->installLocation = line.mid(indexes[i], indexes[i + 1] - indexes[i++]).trimmed();
-        product->installState = line.mid(indexes[i], indexes[i + 1] - indexes[i++]).trimmed();
-        product->name = line.mid(indexes[i], indexes[i + 1] - indexes[i++]).trimmed();
-        product->packCache = line.mid(indexes[i], indexes[i + 1] - indexes[i++]).trimmed();
-        product->skuNumber = line.mid(indexes[i], indexes[i + 1] - indexes[i++]).trimmed();
-        product->vendor = line.mid(indexes[i], indexes[i + 1] - indexes[i++]).trimmed();
-        product->version = line.mid(indexes[i], line.length() - indexes[i++]).trimmed();
+        QStringList product;
 
+        for (int i = 0; i < indexes.length(); i++) {
+            int end = (i + 1 == indexes.length()) ? line.length() : indexes[i + 1];
+            product[i] = line.mid(indexes[i], end - indexes[i]).trimmed();
+        }
         productList.push_back(product);
     }
 
     for (size_t i = 0; i < productList.length(); i++) {
-        _model->setItem(i, 0, new QStandardItem(tr(productList[i]->desc.toStdString().c_str())));
-        _model->setItem(i, 1, new QStandardItem(productList[i]->idNumber));
-        _model->setItem(i, 2, new QStandardItem(productList[i]->installDate));
-        _model->setItem(i, 3, new QStandardItem(productList[i]->installLocation));
-        _model->setItem(i, 4, new QStandardItem(productList[i]->installState));
-        _model->setItem(i, 5, new QStandardItem(productList[i]->name));
-        _model->setItem(i, 6, new QStandardItem(productList[i]->packCache));
-        _model->setItem(i, 7, new QStandardItem(productList[i]->skuNumber));
-        _model->setItem(i, 8, new QStandardItem(productList[i]->vendor));
-        _model->setItem(i, 9, new QStandardItem(productList[i]->version));
+        for (size_t j = 0; j < columns.length(); j++) {
+            _model->setItem(i, j, new QStandardItem(tr(productList[i][j].toStdString().c_str())));
+        }
     }
 
     return productList;

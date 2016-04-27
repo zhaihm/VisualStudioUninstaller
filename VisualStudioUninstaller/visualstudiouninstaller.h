@@ -5,20 +5,6 @@
 #include <QProcess>
 #include "ui_visualstudiouninstaller.h"
 
-struct Product
-{
-    QString desc;
-    QString idNumber;
-    QString installDate;
-    QString installLocation;
-    QString installState;
-    QString name;
-    QString packCache;
-    QString skuNumber;
-    QString vendor;
-    QString version;
-};
-
 class QStandardItemModel;
 class VisualStudioUninstaller : public QMainWindow
 {
@@ -28,7 +14,7 @@ public:
 	VisualStudioUninstaller(QWidget *parent = 0);
 	~VisualStudioUninstaller();
 
-    QList<Product *> productList();
+    QList<QStringList> productList();
     void updateTableView();
 
 private:
