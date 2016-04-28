@@ -15,12 +15,17 @@ public:
 	~VisualStudioUninstaller();
 
     QList<QStringList> productList();
-    void updateTableView();
+    void updateTableView(const QList<QStringList>& productList);
+
+private slots:
+    void on_refreshAction_triggered();
+    void on_exitAction_triggered();
 
 private:
 	Ui::VisualStudioUninstallerClass ui;
     QProcess _process;
     QStandardItemModel *_model;
+    QStringList _headers;
 };
 
 #endif // VISUALSTUDIOUNINSTALLER_H

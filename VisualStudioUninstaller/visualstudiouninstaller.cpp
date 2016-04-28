@@ -13,26 +13,18 @@ VisualStudioUninstaller::VisualStudioUninstaller(QWidget *parent)
     ui.tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.tableView->setSortingEnabled(true);
     _model = new QStandardItemModel;
+    _headers = QStringList({ "Description", "IdentifyingNumber", "InstallDate", "InstallLocation", "InstallState", "Name", "PackageCache", "SKUNumber", "Vendor", "Version" });
 	
-    productList();
+    on_refreshAction_triggered();
 }
 
 VisualStudioUninstaller::~VisualStudioUninstaller()
 {
-
 }
 
 QList<QStringList> VisualStudioUninstaller::productList()
 {
-    QList<QStringList> productList; // not using QStringList *, to avoid (*productList[i])[j]
-
-    // init table
-    QStringList columns = { "Description", "IdentifyingNumber", "InstallDate", "InstallLocation", "InstallState", "Name", "PackageCache", "SKUNumber", "Vendor", "Version" };
-    _model->setColumnCount(columns.length());
-    for (size_t i = 0; i < columns.length(); i++) {
-        _model->setHeaderData(i, Qt::Horizontal, columns[i]);
-    }
-    ui.tableView->setModel(_model);
+    QList<QStringList> productList; // not using QStringList *, to avoid ugly code like (*productList[i])[j]
 
     QString program = "wmic";
     QStringList args;
@@ -43,15 +35,15 @@ QList<QStringList> VisualStudioUninstaller::productList()
         return productList;
 
     QTextStream ts(&_process);
-    ts.setCodec(LOCALE);
+    ts.setCodec("utf8");
 
-    QString header = ts.readLine();
-    if (header.isEmpty())
+    QString headerLine = ts.readLine();
+    if (headerLine.isEmpty())
         return productList;
 
     QList<int> indexes;
-    foreach (QString column, columns) {
-        indexes.push_back(header.indexOf(column));
+    foreach (QString header, _headers) {
+        indexes.push_back(headerLine.indexOf(header));
     }
 
     QString line;
@@ -60,21 +52,41 @@ QList<QStringList> VisualStudioUninstaller::productList()
 
         for (int i = 0; i < indexes.length(); i++) {
             int end = (i + 1 == indexes.length()) ? line.length() : indexes[i + 1];
-            product[i] = line.mid(indexes[i], end - indexes[i]).trimmed();
+            product.push_back(line.mid(indexes[i], end - indexes[i]).trimmed());
         }
         productList.push_back(product);
-    }
-
-    for (size_t i = 0; i < productList.length(); i++) {
-        for (size_t j = 0; j < columns.length(); j++) {
-            _model->setItem(i, j, new QStandardItem(tr(productList[i][j].toStdString().c_str())));
-        }
     }
 
     return productList;
 }
 
-void VisualStudioUninstaller::updateTableView()
+void VisualStudioUninstaller::updateTableView(const QList<QStringList>& productList)
 {
-    
+    _model->clear();
+
+    // re-init model
+    _model->setColumnCount(_headers.length());
+    for (size_t i = 0; i < _headers.length(); i++) {
+        _model->setHeaderData(i, Qt::Horizontal, _headers[i]);
+    }
+    ui.tableView->setModel(_model);
+
+    for (size_t i = 0; i < productList.length(); i++) {
+        for (size_t j = 0; j < _headers.length(); j++) {
+            _model->setItem(i, j, new QStandardItem(tr(productList[i][j].toStdString().c_str())));
+        }
+    }
+}
+
+void VisualStudioUninstaller::on_refreshAction_triggered()
+{
+    qDebug() << "refreshing...";
+
+    QList<QStringList> pl = productList();
+    updateTableView(pl);
+}
+
+void VisualStudioUninstaller::on_exitAction_triggered()
+{
+    exit(0);
 }
