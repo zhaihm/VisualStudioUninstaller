@@ -105,7 +105,7 @@ void VisualStudioUninstaller::onTableViewRightClicked(const QPoint & pos)
     qDebug() << "TableView right clicked on row" << index.row() << "column" << index.column();
 
     _currentProductName = _model->item(index.row(), 5 /* product name */)->data().toString();
-    _menu->exec(ui.tableView->mapToGlobal(pos));
+    _menu->exec(QCursor::pos());
 }
 
 void VisualStudioUninstaller::onDeleteProduct(bool)
