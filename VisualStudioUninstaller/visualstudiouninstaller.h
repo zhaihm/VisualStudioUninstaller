@@ -20,12 +20,16 @@ public:
 private slots:
     void on_refreshAction_triggered();
     void on_exitAction_triggered();
+    void onTableViewRightClicked(const QPoint & pos);
+    void onDeleteProduct(bool);
 
 private:
 	Ui::VisualStudioUninstallerClass ui;
     QProcess _process;
     QStandardItemModel *_model;
     QStringList _headers;
+    QMenu *_menu;
+    QString _currentProductName;
 };
 
 #endif // VISUALSTUDIOUNINSTALLER_H

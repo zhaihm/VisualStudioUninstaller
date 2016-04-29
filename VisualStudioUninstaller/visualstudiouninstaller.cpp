@@ -12,8 +12,16 @@ VisualStudioUninstaller::VisualStudioUninstaller(QWidget *parent)
     ui.tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui.tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.tableView->setSortingEnabled(true);
+    ui.tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui.tableView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(onTableViewRightClicked(const QPoint&)));
     _model = new QStandardItemModel;
     _headers = QStringList({ "Description", "IdentifyingNumber", "InstallDate", "InstallLocation", "InstallState", "Name", "PackageCache", "SKUNumber", "Vendor", "Version" });
+
+    QAction *deleteItem = new QAction("&Delete", this);
+    connect(deleteItem, SIGNAL(triggered(bool)), SLOT(onDeleteProduct(bool))); 
+    
+    _menu = new QMenu(this);
+    _menu->addAction(deleteItem);    
 	
     on_refreshAction_triggered();
 }
@@ -89,4 +97,28 @@ void VisualStudioUninstaller::on_refreshAction_triggered()
 void VisualStudioUninstaller::on_exitAction_triggered()
 {
     exit(0);
+}
+
+void VisualStudioUninstaller::onTableViewRightClicked(const QPoint & pos)
+{
+    QModelIndex index = ui.tableView->currentIndex();
+    qDebug() << "TableView right clicked on row" << index.row() << "column" << index.column();
+
+    _currentProductName = _model->item(index.row(), 5 /* product name */)->data().toString();
+    _menu->exec(ui.tableView->mapToGlobal(pos));
+}
+
+void VisualStudioUninstaller::onDeleteProduct(bool)
+{
+    qDebug() << "Deleting product" << _currentProductName << "...";
+    return;
+
+    QProcess deleteProcess;
+    QString program = "wmic";
+    QStringList args;
+    args << "product" << QString("where name=\"%1\"").arg(_currentProductName) << "call uninstall";
+
+    deleteProcess.start(program, args);
+    if (!deleteProcess.waitForStarted() || !deleteProcess.waitForFinished())
+        return;
 }
