@@ -28,3 +28,5 @@ I listed VS2013's components by `wmic product list`. And uninstall them one by o
 
 ### Plan
 I'm trying to develop a program which can auto-detect the components you have installed. Then it will generate a component list. You could select those you want to uninstall, and do the uninstallation.
+
+After some efforts, I find out that to make a GUI for this program is worthless. I'll try to make it a command line program.
