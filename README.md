@@ -1,5 +1,5 @@
 # VisualStudioUninstaller
-A batch script based on wmic to unstall Microsoft Visual Studio 2013.
+A program based on `wmic` to unstall Microsoft Visual Studio.
 
 ### Introduction
 Visual Studio is a high integrated software whose components may depend on:
